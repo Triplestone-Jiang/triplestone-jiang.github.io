@@ -1,0 +1,52 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge, chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="keywords" content="ycwalker,前端,设计,此去,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><link rel="stylesheet" href="/css/index.css"><link rel="icon" href="/images/favicon.ico"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><title>常用的HTML5 meta标签</title><meta name="keywords" content="HTML"></head><body><div class="container"><div class="nav"><ul><li class="item"><a href="/">主页</a></li><li class="item"><a href="/archives">归档</a></li><li class="item"><a href="/categories">分类</a></li><li class="item"><a href="/tags/">标签</a></li><li class="item"><a href="/about/">关于</a></li></ul></div><article><header><h1 class="title">常用的HTML5 meta标签</h1><i class="icon-calendar"></i><span>2016.05.12</span></header><div class="content"><p>对于移动端而言，meta标签相当重要，本文介绍一些常用的meta标签。</p>
+<a id="more"></a>
+<h3 id="charset"><a href="#charset" class="headerlink" title="charset"></a>charset</h3><p>声明文档使用的字符编码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta charset=&quot;utf-8&quot;&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="lang属性"><a href="#lang属性" class="headerlink" title="lang属性"></a>lang属性</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;html lang=&quot;zh-cmn-Hans&quot;&gt;</span><br></pre></td></tr></table></figure>
+<p>或<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;html lang=&quot;zh-CH&quot;&gt;</span><br></pre></td></tr></table></figure></p>
+<p>前者是更标准的写法，后者的浏览器兼容比较好<br>参考自 <a href="http://zhi.hu/XyIa" target="_blank" rel="noopener">zhi.hu/XyIa</a></p>
+<h3 id="优先使用-IE-最新版本和-Chrome"><a href="#优先使用-IE-最新版本和-Chrome" class="headerlink" title="优先使用 IE 最新版本和 Chrome"></a>优先使用 IE 最新版本和 Chrome</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge,chrome=1&quot; /&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="360-使用Google-Chrome-Frame"><a href="#360-使用Google-Chrome-Frame" class="headerlink" title="360 使用Google Chrome Frame"></a>360 使用Google Chrome Frame</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta name=&quot;renderer&quot; content=&quot;webkit&quot;&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="SEO-优化"><a href="#SEO-优化" class="headerlink" title="SEO 优化"></a>SEO 优化</h3><ul>
+<li><p>页面关键词 keywords</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta name=&quot;keywords&quot; content=&quot;your keywords&quot;&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>页面描述内容 description</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta name=&quot;description&quot; content=&quot;your description&quot;&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>定义网页作者 author</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta name=&quot;author&quot; content=&quot;author,email address&quot;&gt;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>定义网页搜索引擎索引方式，robotterms 是一组使用英文逗号「,」分割的值，通常有如下几种取值：none，noindex，nofollow，all，index和follow。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta name=&quot;robots&quot; content=&quot;index,follow&quot;&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="移动设备-viewport"><a href="#移动设备-viewport" class="headerlink" title="移动设备 viewport"></a>移动设备 viewport</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta name =&quot;viewport&quot; content =&quot;initial-scale=1, maximum-scale=3, minimum-scale=1, user-scalable=no&quot;&gt;</span><br></pre></td></tr></table></figure>
+<p>其中<code>content</code>的参数：</p>
+<ul>
+<li>width viewport 宽度(数值/device-width)</li>
+<li>height viewport 高度(数值/device-height)</li>
+<li>initial-scale 初始缩放比例</li>
+<li>maximum-scale 最大缩放比例</li>
+<li>minimum-scale 最小缩放比例</li>
+<li>user-scalable 是否允许用户缩放(yes/no)</li>
+</ul>
+<p>而如果你的网站不是响应式的，则不要使用 initial-scale 或者禁用缩放<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,user-scalable=yes&quot;&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="关闭chrome浏览器下翻译插件"><a href="#关闭chrome浏览器下翻译插件" class="headerlink" title="关闭chrome浏览器下翻译插件"></a>关闭chrome浏览器下翻译插件</h3><p>关闭chrome浏览器下翻译插件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta name=&quot;google&quot; value=&quot;notranslate&quot; /&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h3><a href="https://github.com/yisibl/blog/issues/1" target="_blank" rel="noopener">常用的 HTML 头部标签</a></div></article><div id="disqus_thread"></div><script>var disqus_config = function () {
+  this.page.url = "http://yoursite.com/2016/05/12/meta/";
+  this.page.identifier = "2016/05/12/meta/";
+};
+
+(function () {
+  var d = document, s = d.createElement('script');
+  s.src = 'https://ciqu.disqus.com/embed.js';
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();</script></div></body><script>var _hmt = _hmt || []
+;(function () {
+  var hm = document.createElement("script")
+  hm.src = "https://hm.baidu.com/hm.js?ad593ccdd2ffe5cf791b35fee21d343d"
+  var s = document.getElementsByTagName("script")[0]
+  s.parentNode.insertBefore(hm, s)
+})()</script></html>

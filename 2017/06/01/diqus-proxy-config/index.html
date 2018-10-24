@@ -1,0 +1,51 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge, chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="keywords" content="ycwalker,前端,设计,此去,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><link rel="stylesheet" href="/css/index.css"><link rel="icon" href="/images/favicon.ico"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><title>Disqus-Proxy 配置说明</title><meta name="keywords" content="Hexo,koa,React.js,Disqus"></head><body><div class="container"><div class="nav"><ul><li class="item"><a href="/">主页</a></li><li class="item"><a href="/archives">归档</a></li><li class="item"><a href="/categories">分类</a></li><li class="item"><a href="/tags/">标签</a></li><li class="item"><a href="/about/">关于</a></li></ul></div><article><header><h1 class="title">Disqus-Proxy 配置说明</h1><i class="icon-calendar"></i><span>2017.06.01</span></header><div class="content"><h3 id="说在前面"><a href="#说在前面" class="headerlink" title="说在前面"></a>说在前面</h3><p>如果你对这个项目的思路感兴趣，可以参考这篇文章：<br><a href="https://ycwalker.com/2017/06/01/about-diqus-proxy/" target="_blank" rel="noopener">解决 Disqus 在国内不能访问的方案</a></p>
+<p>项目地址：<br><a href="https://github.com/ciqulover/disqus-proxy" target="_blank" rel="noopener">Disqus-Proxy</a></p>
+<p><a href="https://www.npmjs.org/package/hexo-disqus-proxy" target="_blank" rel="external"><img style="display:inline" src="https://img.shields.io/npm/v/hexo-disqus-proxy.svg?style=flat" alt="npm package"></a>&nbsp;<img src="https://img.shields.io/badge/node-%3E7.6-brightgreen.svg" style="display:inline" alt=""></p>
+<h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><ul>
+<li>一台国外的VPS服务器</li>
+<li>一点点的HTML基本知识</li>
+</ul>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>在<code>Hexo</code>博客目录执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-disqus-proxy --save</span><br></pre></td></tr></table></figure></p>
+<h3 id="前端配置"><a href="#前端配置" class="headerlink" title="前端配置"></a>前端配置</h3><p>在你的<code>Hexo</code>博客目录中修改<code>_config.yml</code>文件<br>添加如下配置：（注意缩进和空格）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">disqus_proxy:</span><br><span class="line">  shortname: ciqu</span><br><span class="line">  username: ciqu</span><br><span class="line">  host: disqus-proxy.ycwalker.com</span><br><span class="line">  port: 443</span><br><span class="line">  admin_avatar: /avatars/admin-avatar.jpg</span><br><span class="line">  default_avatar: /avatars/default-avatar.png</span><br></pre></td></tr></table></figure></p>
+<p>其中：</p>
+<ul>
+<li><code>shortname</code> 是你的website的 shortname 名称 比如在你的disqus安装代码中 有这样一句脚本：<pre><code>s.src = &apos;https://test-eo9kkdlcze.disqus.com/embed.js&apos;;
+那么你的disqus 的shortname 就是 test-eo9kkdlcze
+</code></pre></li>
+<li><code>username</code> 是你的disqus用户名，即评论时候留下的名字，用来区别disqus-proxy的评论头像显示</li>
+<li><code>host</code>是你启用disqus代理的VPS的域名</li>
+<li><code>port</code>是VPS服务器启用disqus代理的端口，需要与之后设置的后端一致</li>
+<li><code>default_avatar</code>和<code>admin_avatar</code>分别是默认头像和管理员头像的路径。例如在<code>source</code>目录下建立<code>avatars</code>目录，放入两个头像，在这里设置成绝对路径。如果不设置，则为默认头像。</li>
+</ul>
+<h4 id="关键的一步"><a href="#关键的一步" class="headerlink" title="关键的一步"></a>关键的一步</h4><p>在<code>disqus</code>的官方配置中，我们需要在页面合适位置添加一个 <code>&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;</code> 作为占位符，<br>而<code>hexo-disqus-proxy</code>插件并不能知道在页面的哪个位置插入这个标签比较合适，所以这个需要额外配置一下：</p>
+<h5 id="情况一"><a href="#情况一" class="headerlink" title="情况一"></a>情况一</h5><p>如果你本身用的主题已经支持<code>disqus</code>的配置，那么灰常爽，你只需要正常启用主题的disqus评论，插件就会自动检测并合适的覆盖，<br>这是最常见的情况，肯定是最吼的。</p>
+<h5 id="情况二"><a href="#情况二" class="headerlink" title="情况二"></a>情况二</h5><p>在你写的<code>markdown</code>文件底部插入<code>&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;</code>。这样评论框位置会位于文章的下方，并且大小能被外部元素所约束，不会乱跑。<br>什么，<code>markdown</code>也能插入<code>HTML</code>标签？</p>
+<p>嗯是的。</p>
+<h5 id="情况三"><a href="#情况三" class="headerlink" title="情况三"></a>情况三</h5><p>稍微懂一点点<code>hexo</code>的基本知识，自己改主题。大概的思路是，在<code>Hexo</code>渲染的过程中，把<code>&lt;div id=&quot;disqus_thread&quot;&gt;&lt;/div&gt;</code>加在主题目录下的layout目录中<br>关于博文页面的模板中的合适的位置就行了。</p>
+<h3 id="后端配置"><a href="#后端配置" class="headerlink" title="后端配置"></a>后端配置</h3><p>后端使用<code>Node.js</code>，需要<code>Node.js</code>版本<code>7.6</code>以上。</p>
+<h4 id="在服务器上clone代码"><a href="#在服务器上clone代码" class="headerlink" title="在服务器上clone代码:"></a>在服务器上clone代码:</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/ciqulover/disqus-proxy</span><br></pre></td></tr></table></figure>
+<h4 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h4><p>只需要安装后端的依赖<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm i --production</span><br><span class="line">// 或者</span><br><span class="line">yarn install --production</span><br></pre></td></tr></table></figure></p>
+<h4 id="配置server目录下的config-js"><a href="#配置server目录下的config-js" class="headerlink" title="配置server目录下的config.js"></a>配置<code>server</code>目录下的<code>config.js</code></h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="comment">// 服务端端口，需要与disqus-proxy前端设置一致</span></span><br><span class="line">    port: <span class="number">5509</span>,</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// 你的diqus secret key</span></span><br><span class="line">    api_secret: <span class="string">'your secret key'</span>,</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// 你的website的 shortname 名称 比如在你的disqus安装代码中 有这样一句脚本：</span></span><br><span class="line">    <span class="comment">// s.src = 'https://test-eo9kkdlcze.disqus.com/embed.js';</span></span><br><span class="line">    <span class="comment">// 那么你的disqus 的shortname 就是 test-eo9kkdlcze</span></span><br><span class="line">    shortname: <span class="string">'ciqu'</span>,</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// 服务端socks5代理转发，便于在本地测试，生产环境通常为null</span></span><br><span class="line">    <span class="comment">// socks5Proxy: &#123;</span></span><br><span class="line">    <span class="comment">//   host: 'localhost',</span></span><br><span class="line">    <span class="comment">//   port: 1086</span></span><br><span class="line">    <span class="comment">// &#125;,</span></span><br><span class="line">  </span><br><span class="line">    socks5Proxy: <span class="literal">null</span>,</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// 日志输出位置,输出到文件或控制台 'file' | 'console'</span></span><br><span class="line">    log: <span class="string">'console'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="获取api-secret"><a href="#获取api-secret" class="headerlink" title="获取api-secret"></a>获取<code>api-secret</code></h4><p><code>api-secret</code>需要你在<a href="https://disqus.com/" target="_blank" rel="noopener">disqus</a>的官方网站上开启API权限，申请成功后会得到这个秘钥。</p>
+<p>并且需要在后台的Settings =&gt; Community里开启访客评论</p>
+<h4 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd server</span><br><span class="line">node index.js</span><br></pre></td></tr></table></figure>
+<p>推荐用<code>pm2</code>在生产环境启动，否则你断开ssh，node进程就终止了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install pm2 -g</span><br><span class="line">pm2 start index.js</span><br></pre></td></tr></table></figure>
+<p>如果你在配置文件中选择<code>log</code>类型为<code>file</code>, 那么输出的日志文件将在默认为server目录下的<code>disqus-proxy.log</code></p>
+<h4 id="Done"><a href="#Done" class="headerlink" title="Done !"></a>Done !</h4></div></article><div id="disqus_thread"></div><script>var disqus_config = function () {
+  this.page.url = "http://yoursite.com/2017/06/01/diqus-proxy-config/";
+  this.page.identifier = "2017/06/01/diqus-proxy-config/";
+};
+
+(function () {
+  var d = document, s = d.createElement('script');
+  s.src = 'https://ciqu.disqus.com/embed.js';
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();</script></div></body><script>var _hmt = _hmt || []
+;(function () {
+  var hm = document.createElement("script")
+  hm.src = "https://hm.baidu.com/hm.js?ad593ccdd2ffe5cf791b35fee21d343d"
+  var s = document.getElementsByTagName("script")[0]
+  s.parentNode.insertBefore(hm, s)
+})()</script></html>

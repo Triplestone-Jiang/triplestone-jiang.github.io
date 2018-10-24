@@ -1,0 +1,90 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge, chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="keywords" content="ycwalker,前端,设计,此去,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><link rel="stylesheet" href="/css/index.css"><link rel="icon" href="/images/favicon.ico"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><title>CORS 中 Preflight 过程</title><meta name="keywords" content="CORS"></head><body><div class="container"><div class="nav"><ul><li class="item"><a href="/">主页</a></li><li class="item"><a href="/archives">归档</a></li><li class="item"><a href="/categories">分类</a></li><li class="item"><a href="/tags/">标签</a></li><li class="item"><a href="/about/">关于</a></li></ul></div><article><header><h1 class="title">CORS 中 Preflight 过程</h1><i class="icon-calendar"></i><span>2017.05.23</span></header><div class="content"><h2 id="两种CORS类型"><a href="#两种CORS类型" class="headerlink" title="两种CORS类型"></a>两种CORS类型</h2><p>CORS 请求可以分为两种类型</p>
+<ul>
+<li>简单的请求</li>
+<li>『不是那么简单的请求』</li>
+</ul>
+<a id="more"></a>
+<p><strong>简单的请求需要满足如下标准：</strong></p>
+<h3 id="HTTP-请求时下面其中之一（大小写敏感）："><a href="#HTTP-请求时下面其中之一（大小写敏感）：" class="headerlink" title="HTTP 请求时下面其中之一（大小写敏感）："></a>HTTP 请求时下面其中之一（大小写敏感）：</h3><ul>
+<li>HEAD</li>
+<li>GET</li>
+<li>POST</li>
+</ul>
+<h3 id="HTTP-头部与下面匹配-大小写敏感-："><a href="#HTTP-头部与下面匹配-大小写敏感-：" class="headerlink" title="HTTP 头部与下面匹配(大小写敏感)："></a>HTTP 头部与下面匹配(大小写敏感)：</h3><ul>
+<li>Accept</li>
+<li>Accept-Language</li>
+<li>Content-Language</li>
+<li>Last-Event-ID</li>
+<li>Content-Type, 但只能是下面这几个值:<ul>
+<li>application/x-www-form-urlencoded</li>
+<li>multipart/form-data</li>
+<li>text/plain</li>
+</ul>
+</li>
+</ul>
+<p>为什么会简单的请求会有这些特征呢？其实这些请求本身就可以不用脚本直接由浏览器搞定。比如<code>JSONP</code>可以直接搞定跨域请求。<code>HTML</code>表单可以弄出<code>POST</code>请求。</p>
+<p>不满足以上标准的就叫『不是那么简单的请求』。这就需要浏览器和服务器多做点交流。这个多余的交流过程就叫 preflight。之后会详细说明。</p>
+<h2 id="处理简单-CORS-请求"><a href="#处理简单-CORS-请求" class="headerlink" title="处理简单 CORS 请求"></a>处理简单 CORS 请求</h2><p>假设发起请求的页面是 <code>http://api.bob.com</code>, 用 JavaScript 发出一个跨域请求:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> url = <span class="string">'http://api.alice.com/cors'</span>;</span><br><span class="line"><span class="keyword">var</span> xhr = createCORSRequest(<span class="string">'GET'</span>, url);</span><br><span class="line">xhr.send();</span><br></pre></td></tr></table></figure>
+<p>请求头部:<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">GET</span> <span class="string">/cors</span> <span class="string">HTTP/1.1</span></span><br><span class="line"><span class="attr">Origin:</span> <span class="attr">http://api.bob.com</span></span><br><span class="line"><span class="attr">Host:</span> <span class="string">api.alice.com</span></span><br><span class="line"><span class="attr">Accept-Language:</span> <span class="string">en-US</span></span><br><span class="line"><span class="attr">Connection:</span> <span class="string">keep-alive</span></span><br><span class="line"><span class="attr">User-Agent:</span> <span class="string">Mozilla/5.0...</span></span><br></pre></td></tr></table></figure></p>
+<p>需要注意的是 CORS 请求<strong>一定</strong>会有 Origin 的 Header。这个 Header 是由浏览器加上的，不能被用户控制。格式是协议+域名+端口（不是默认端口的话）。</p>
+<p>比如：<a href="http://api.alice.com" target="_blank" rel="noopener">http://api.alice.com</a></p>
+<p>加上这个 Origin Header 也不一定说明这玩意是跨域请求。因为一些同域名的请求也可能有 Origin Header。具体因浏览器而异。但当在同域请求时，浏览器会忽视 CORS 的 response header。</p>
+<p>下面是一个有效的 CORS response：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">Access-Control-Allow-Origin:</span> <span class="attr">http://api.bob.com</span></span><br><span class="line"><span class="attr">Access-Control-Allow-Credentials:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">Access-Control-Expose-Headers:</span> <span class="string">FooBar</span></span><br><span class="line"><span class="attr">Content-Type:</span> <span class="string">text/html;</span> <span class="string">charset=utf-8</span></span><br></pre></td></tr></table></figure>
+<p>所有与 CORS 相关的 Headers 都会有 <code>Access-Control-</code> 的前缀。</p>
+<p>其中：</p>
+<h3 id="Access-Control-Allow-Origin-（必须）"><a href="#Access-Control-Allow-Origin-（必须）" class="headerlink" title="Access-Control-Allow-Origin （必须）"></a>Access-Control-Allow-Origin （必须）</h3><p>这个Header 必须包含在 CORS 请求的 response 中。如果没有，CORS 请求就会失败。这个 Header 的值可以和 请求的域名一样，也可以为<code>*</code>，如果是后者，所有网站发出的跨域请求都会被满足。</p>
+<h3 id="Access-Control-Allow-Credentials-（可选）"><a href="#Access-Control-Allow-Credentials-（可选）" class="headerlink" title="Access-Control-Allow-Credentials （可选）"></a>Access-Control-Allow-Credentials （可选）</h3><p>默认情况下，cookie 是不会包含在 CORS 请求中的，但是设置了这个值后，浏览器发出请求会带上所有目标域名的 cookie，并在得到 response 后设置该域名的 cookie 。这个 Header 唯一的值只能是<code>true</code>，如果不需要 cookie，就不能包含这个 Header，而不是设置值为<code>fasle</code></p>
+<p>这个 Header 需要XMLHttpRequest 2对象的 <code>withCredentials</code> 属性设置为 <code>true</code>。<br>两者缺一不可。</p>
+<h3 id="Access-Control-Expose-Headers-（可选）"><a href="#Access-Control-Expose-Headers-（可选）" class="headerlink" title="Access-Control-Expose-Headers （可选）"></a>Access-Control-Expose-Headers （可选）</h3><p>如果设置这个属性，那么通过<code>getResponseHeader()</code> 方法可以获得结果简单的 Headers。</p>
+<p>允许的值为：</p>
+<ul>
+<li>Cache-Control</li>
+<li>Content-Language</li>
+<li>Content-Type</li>
+<li>Expires</li>
+<li>Last-Modified</li>
+<li>Pragma</li>
+</ul>
+<p><code>Access-Control-Expose-Headers</code>的值用逗号分隔。</p>
+<h2 id="处理『不是那么简单的请求』"><a href="#处理『不是那么简单的请求』" class="headerlink" title="处理『不是那么简单的请求』"></a>处理『不是那么简单的请求』</h2><p>比如请求的方法是 PUT 和 DELETE，或者设置如 <code>Content-Type: application/json</code>,那么这就是一个『不是那么简单的请求』。</p>
+<p>这个过程包含了一个 preflight 的过程。在这个过程中，浏览器和服务器协商，看看服务器是否支持接下来的跨域请求。这个 preflight，就是 <code>OPTIONS</code> 请求。如果协商成功，那么浏览器会真正发出目标请求。preflight 可以被缓存。</p>
+<p>发送一个 CORS 请求：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> url = <span class="string">'http://api.alice.com/cors'</span>;</span><br><span class="line"><span class="keyword">var</span> xhr = createCORSRequest(<span class="string">'PUT'</span>, url);</span><br><span class="line">xhr.setRequestHeader(</span><br><span class="line">    <span class="string">'X-Custom-Header'</span>, <span class="string">'value'</span>);</span><br><span class="line">xhr.send();</span><br></pre></td></tr></table></figure></p>
+<p>Preflight 请求:<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">OPTIONS</span> <span class="string">/cors</span> <span class="string">HTTP/1.1</span></span><br><span class="line"><span class="attr">Origin:</span> <span class="attr">http://api.bob.com</span></span><br><span class="line"><span class="attr">Access-Control-Request-Method:</span> <span class="string">PUT</span></span><br><span class="line"><span class="attr">Access-Control-Request-Headers:</span> <span class="string">X-Custom-Header</span></span><br><span class="line"><span class="attr">Host:</span> <span class="string">api.alice.com</span></span><br><span class="line"><span class="attr">Accept-Language:</span> <span class="string">en-US</span></span><br><span class="line"><span class="attr">Connection:</span> <span class="string">keep-alive</span></span><br><span class="line"><span class="attr">User-Agent:</span> <span class="string">Mozilla/5.0...</span></span><br></pre></td></tr></table></figure></p>
+<p>CORS 请求的 Header 可以包括下面两个额外的值：</p>
+<h3 id="Access-Control-Request-Method"><a href="#Access-Control-Request-Method" class="headerlink" title="Access-Control-Request-Method"></a>Access-Control-Request-Method</h3><p>这个 Header 一定会存在，表示实际的请求，即使是简单的请求（GET，POST，HEAD）</p>
+<h3 id="Access-Control-Request-Headers"><a href="#Access-Control-Request-Headers" class="headerlink" title="Access-Control-Request-Headers"></a>Access-Control-Request-Headers</h3><p>包含在 CORS 请求的 header</p>
+<p>上面的那一个 Preflight 请求<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">OPTIONS</span> <span class="string">/cors</span> <span class="string">HTTP/1.1</span></span><br><span class="line"><span class="attr">Origin:</span> <span class="attr">http://api.bob.com</span></span><br><span class="line"><span class="attr">Access-Control-Request-Method:</span> <span class="string">PUT</span></span><br><span class="line"><span class="attr">Access-Control-Request-Headers:</span> <span class="string">X-Custom-Header</span></span><br><span class="line"><span class="attr">Host:</span> <span class="string">api.alice.com</span></span><br><span class="line"><span class="attr">Accept-Language:</span> <span class="string">en-US</span></span><br><span class="line"><span class="attr">Connection:</span> <span class="string">keep-alive</span></span><br><span class="line"><span class="attr">User-Agent:</span> <span class="string">Mozilla/5.0...</span></span><br></pre></td></tr></table></figure></p>
+<p>Response:</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">Access-Control-Allow-Origin:</span> <span class="attr">http://api.bob.com</span></span><br><span class="line"><span class="attr">Access-Control-Allow-Methods:</span> <span class="string">GET,</span> <span class="string">POST,</span> <span class="string">PUT</span></span><br><span class="line"><span class="attr">Access-Control-Allow-Headers:</span> <span class="string">X-Custom-Header</span></span><br><span class="line"><span class="attr">Content-Type:</span> <span class="string">text/html;</span> <span class="string">charset=utf-8</span></span><br></pre></td></tr></table></figure>
+<h3 id="Access-Control-Allow-Origin-（必须）-1"><a href="#Access-Control-Allow-Origin-（必须）-1" class="headerlink" title="Access-Control-Allow-Origin （必须）"></a>Access-Control-Allow-Origin （必须）</h3><p>同简单的请求。</p>
+<h3 id="Access-Control-Allow-Methods-（必须）"><a href="#Access-Control-Allow-Methods-（必须）" class="headerlink" title="Access-Control-Allow-Methods （必须）"></a>Access-Control-Allow-Methods （必须）</h3><p>表示服务器支持的请求方法，逗号分隔。</p>
+<p>即使只请求某个特定的方法，然而服务器会返回所有的支持的方法，这个可以方便缓存后不需要额外的 <code>OPTIONS</code> 请求。</p>
+<h3 id="Access-Control-Allow-Credentials-（可选）-1"><a href="#Access-Control-Allow-Credentials-（可选）-1" class="headerlink" title="Access-Control-Allow-Credentials （可选）"></a>Access-Control-Allow-Credentials （可选）</h3><p>同简单的请求。</p>
+<h3 id="Access-Control-Allow-Headers"><a href="#Access-Control-Allow-Headers" class="headerlink" title="Access-Control-Allow-Headers"></a>Access-Control-Allow-Headers</h3><p>如果在<code>OPTIONS</code>请求中包含了<code>Access-Control-Request-Headers</code> ，那么这个是必须的。这回返回所有服务器支持的 Header，哪怕并没在 preflight 中列出。</p>
+<h3 id="Access-Control-Max-Age-（可选）"><a href="#Access-Control-Max-Age-（可选）" class="headerlink" title="Access-Control-Max-Age （可选）"></a>Access-Control-Max-Age （可选）</h3><p>允许 preflight 缓存，之后就可以不需要进行<code>OPTIONS</code>请求咯。</p>
+<p>当这些条件满足之后，浏览器会发出真正的请求。<br>比如：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">PUT</span> <span class="string">/cors</span> <span class="string">HTTP/1.1</span></span><br><span class="line"><span class="attr">Origin:</span> <span class="attr">http://api.bob.com</span></span><br><span class="line"><span class="attr">Host:</span> <span class="string">api.alice.com</span></span><br><span class="line"><span class="attr">X-Custom-Header:</span> <span class="string">value</span></span><br><span class="line"><span class="attr">Accept-Language:</span> <span class="string">en-US</span></span><br><span class="line"><span class="attr">Connection:</span> <span class="string">keep-alive</span></span><br><span class="line"><span class="attr">User-Agent:</span> <span class="string">Mozilla/5.0...</span></span><br></pre></td></tr></table></figure></p>
+<p>真的的 response<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">Access-Control-Allow-Origin:</span> <span class="attr">http://api.bob.com</span></span><br><span class="line"><span class="attr">Content-Type:</span> <span class="string">text/html;</span> <span class="string">charset=utf-8</span></span><br></pre></td></tr></table></figure></p>
+<p>如果服务器想拒绝请求，那么只要在 preflight 中不设置 CORS 的 Header就行了，并返回一个普通的响应码，比如200。这样浏览器在没有接收到特定的 CORS Header后，会认为请求无效，不会发出真正的请求。例如：</p>
+<p>preflight 请求<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">OPTIONS</span> <span class="string">/cors</span> <span class="string">HTTP/1.1</span></span><br><span class="line"><span class="attr">Origin:</span> <span class="attr">http://api.bob.com</span></span><br><span class="line"><span class="attr">Access-Control-Request-Method:</span> <span class="string">PUT</span></span><br><span class="line"><span class="attr">Access-Control-Request-Headers:</span> <span class="string">X-Custom-Header</span></span><br><span class="line"><span class="attr">Host:</span> <span class="string">api.alice.com</span></span><br><span class="line"><span class="attr">Accept-Language:</span> <span class="string">en-US</span></span><br><span class="line"><span class="attr">Connection:</span> <span class="string">keep-alive</span></span><br><span class="line"><span class="attr">User-Agent:</span> <span class="string">Mozilla/5.0...</span></span><br></pre></td></tr></table></figure></p>
+<p>Preflight Response:<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">//</span> <span class="string">ERROR</span> <span class="bullet">-</span> <span class="literal">No</span> <span class="string">CORS</span> <span class="string">headers,</span> <span class="string">this</span> <span class="string">is</span> <span class="string">an</span> <span class="string">invalid</span> <span class="string">request!</span></span><br><span class="line"><span class="attr">Content-Type:</span> <span class="string">text/html;</span> <span class="string">charset=utf-8</span></span><br></pre></td></tr></table></figure></p>
+<p>这就会触发<code>onerror</code>事件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">XMLHttpRequest cannot load http://api.alice.com. Origin http://api.bob.com is not allowed by Access-Control-Allow-Origin.</span><br></pre></td></tr></table></figure></p>
+<h3 id="节译自：Using-CORS"><a href="#节译自：Using-CORS" class="headerlink" title="节译自：Using CORS"></a>节译自：<a href="https://www.html5rocks.com/en/tutorials/cors/" target="_blank" rel="noopener">Using CORS</a></h3><p>&nbsp;</p>
+</div></article><div id="disqus_thread"></div><script>var disqus_config = function () {
+  this.page.url = "http://yoursite.com/2017/05/23/preflight-in-CORS/";
+  this.page.identifier = "2017/05/23/preflight-in-CORS/";
+};
+
+(function () {
+  var d = document, s = d.createElement('script');
+  s.src = 'https://ciqu.disqus.com/embed.js';
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();</script></div></body><script>var _hmt = _hmt || []
+;(function () {
+  var hm = document.createElement("script")
+  hm.src = "https://hm.baidu.com/hm.js?ad593ccdd2ffe5cf791b35fee21d343d"
+  var s = document.getElementsByTagName("script")[0]
+  s.parentNode.insertBefore(hm, s)
+})()</script></html>

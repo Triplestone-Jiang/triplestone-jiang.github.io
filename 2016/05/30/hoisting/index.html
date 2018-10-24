@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge, chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="keywords" content="ycwalker,前端,设计,此去,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><link rel="stylesheet" href="/css/index.css"><link rel="icon" href="/images/favicon.ico"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><title>深入理解javascript变量声明提升(hoisting)</title><meta name="keywords" content="JavaScript"></head><body><div class="container"><div class="nav"><ul><li class="item"><a href="/">主页</a></li><li class="item"><a href="/archives">归档</a></li><li class="item"><a href="/categories">分类</a></li><li class="item"><a href="/tags/">标签</a></li><li class="item"><a href="/about/">关于</a></li></ul></div><article><header><h1 class="title">深入理解javascript变量声明提升(hoisting)</h1><i class="icon-calendar"></i><span>2016.05.30</span></header><div class="content"><blockquote>
+<p><code>Javascript</code>在代码处理上分为上下两个阶段，第一，这个阶段创建变量，函数声明以及形式参数。这是解析和进入上下文的阶段。</p>
+</blockquote>
+<blockquote>
+<p>第二阶段是代码运行时执行过程，创建函数表达式和不合格的标识符（未定义变量）。</p>
+</blockquote>
+<blockquote>
+<p>但为了实际应用的目的，我们采用了“提升(hoisting)”的概念，这个概念并没有在ECMAScript标准中定义，但却经常来用来表述这种情形。</p>
+</blockquote>
+<p>例如这一段代码:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myName = <span class="string">"chase-young"</span></span><br><span class="line">;(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(myName) <span class="comment">//undefined</span></span><br><span class="line">  <span class="keyword">var</span> myName = <span class="string">"ycarus"</span></span><br><span class="line">&#125;)()</span><br></pre></td></tr></table></figure>
+<p>讲道理，控制台输出的该是<code>chase-young</code>，然而却是<code>undefined</code>，甚至连<code>ycarus</code>都不是。</p>
+<p>这是因为在匿名函数内部，变量myName的声明被“提升”到了函数顶部声明，覆盖掉了函数外声明的<code>myName</code>变量。</p>
+<p>然而在提升并声明的过程中，并没有给覆盖声明的变量赋值，导致控制台输出的<code>undefined</code>.</p>
+<p>所以之前的代码相当于:<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> myName = <span class="string">"chase-young"</span></span><br><span class="line">;(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  <span class="keyword">var</span> myName = <span class="literal">undefined</span></span><br><span class="line">  <span class="built_in">console</span>.log(myName) <span class="comment">//undefined</span></span><br><span class="line">  myName = <span class="string">"ycarus"</span></span><br><span class="line">&#125;)()</span><br></pre></td></tr></table></figure></p>
+<p>类似的，函数声明和函数表达式的区别在于函数表达式并不会连带其中的代码一起被提升，而只是提升变量声明，例如:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">  f1() <span class="comment">//Uncaught TypeError: f1 is not a function</span></span><br><span class="line">  f2() <span class="comment">//Uncaught ReferenceError: f2 is not defined</span></span><br><span class="line">  f3() <span class="comment">//OK</span></span><br><span class="line">  <span class="keyword">var</span> f1 = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">f3</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line">&#125;)()</span><br></pre></td></tr></table></figure>
+<p>因此，为了避免这类因变量声明提升所引发的混乱，最好在一开始就用<code>var</code>声明所有的变量。</p>
+<p>这样有以下优点：</p>
+<ul>
+<li>提供一个单一地址查找到函数所有需要的局部变量</li>
+<li>防止因函数声明所引发的逻辑错误</li>
+<li>帮助牢记要声明的变量，尽可能地少适用全局变量</li>
+</ul>
+</div></article><div id="disqus_thread"></div><script>var disqus_config = function () {
+  this.page.url = "http://yoursite.com/2016/05/30/hoisting/";
+  this.page.identifier = "2016/05/30/hoisting/";
+};
+
+(function () {
+  var d = document, s = d.createElement('script');
+  s.src = 'https://ciqu.disqus.com/embed.js';
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();</script></div></body><script>var _hmt = _hmt || []
+;(function () {
+  var hm = document.createElement("script")
+  hm.src = "https://hm.baidu.com/hm.js?ad593ccdd2ffe5cf791b35fee21d343d"
+  var s = document.getElementsByTagName("script")[0]
+  s.parentNode.insertBefore(hm, s)
+})()</script></html>

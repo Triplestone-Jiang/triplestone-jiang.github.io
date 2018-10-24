@@ -1,0 +1,99 @@
+<!DOCTYPE html><html><head><meta name="generator" content="Hexo 3.8.0"><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge, chrome=1"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="keywords" content="ycwalker,前端,设计,此去,前端开发,用户体验,设计,frontend,design,nodejs,JavaScript"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><link rel="stylesheet" href="/css/index.css"><link rel="icon" href="/images/favicon.ico"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><title>Semantic-Versioning 语义化版本控制</title><meta name="keywords" content="JavaScript,NPM"></head><body><div class="container"><div class="nav"><ul><li class="item"><a href="/">主页</a></li><li class="item"><a href="/archives">归档</a></li><li class="item"><a href="/categories">分类</a></li><li class="item"><a href="/tags/">标签</a></li><li class="item"><a href="/about/">关于</a></li></ul></div><article><header><h1 class="title">Semantic-Versioning 语义化版本控制</h1><i class="icon-calendar"></i><span>2016.06.06</span></header><div class="content"><p>今天在学习npm的package管理时，碰到了新词汇semantic versioning，简称semver，看网上翻译为语义化版本号，但个人觉得翻译为语义化版本控制(规范)会更好些。</p>
+<p>话说以前下载软件是常常遇到类似v1.2.3这样的版本号，耳濡目染之下，自己做个PPT时都会很酷炫地添了版本号。于是正好借此机会，详细整理一下语义化版本控制规范的相关内容。</p>
+<a id="more"></a>
+<h2 id="语义化版本号各位置的含义"><a href="#语义化版本号各位置的含义" class="headerlink" title="语义化版本号各位置的含义"></a>语义化版本号各位置的含义</h2><p>一个标准的版本号必须是X.Y.Z的形式，X是主版本，Y是副版本，Z是补丁版本。.</p>
+<p>X: 代表发生了不兼容的API改变</p>
+<p>Y: 代表向后兼容的功能性变化</p>
+<p>Z: 代表向后兼容bug fixes</p>
+<h2 id="语义化版本控制规范"><a href="#语义化版本控制规范" class="headerlink" title="语义化版本控制规范"></a>语义化版本控制规范</h2><blockquote><p><strong>以下关键词 MUST、MUST NOT、REQUIRED、SHALL、SHALL NOT、SHOULD、SHOULD NOT、 RECOMMENDED、MAY、OPTIONAL 依照 RFC 2119 的叙述解读。</strong></p>
+<ul>
+<li><p>使用语义化版本控制的软件“必须 MUST ”定义公共 API。该 API 可以在代码中被定义或出现于严谨的文件内。无论何种形式都应该力求精确且完整。</p>
+</li>
+<li><p>标准的版本号“必须 MUST ”采用 XYZ 的格式，其中 X、Y 和 Z 为非负的整数，且“禁止 MUST NOT”在数字前方补零。X 是主版本号、Y 是次版本号、而 Z 为修订号。每个元素“必须 MUST ”以数值来递增。例如：1.9.1 -&gt; 1.10.0 -&gt; 1.11.0。</p>
+</li>
+<li><p>标记版本号的软件发行后，“禁止 MUST NOT ”改变该版本软件的内容。任何修改都“必须 MUST ”以新版本发行。</p>
+</li>
+<li><p>主版本号为零（0.y.z）的软件处于开发初始阶段，一切都可能随时被改变。这样的公共 API 不应该被视为稳定版。</p>
+</li>
+<li><p>1.0.0 的版本号用于界定公共 API 的形成。这一版本之后所有的版本号更新都基于公共 API 及其修改内容。</p>
+</li>
+<li><p>修订号 Z（x.y.Z | x &gt; 0）“必须 MUST ”在只做了向下兼容的修正时才递增。这里的修正指的是针对不正确结果而进行的内部修改。</p>
+</li>
+<li><p>次版本号 Y（x.Y.z | x &gt; 0）“必须 MUST ”在有向下兼容的新功能出现时递增。在任何公共 API 的功能被标记为弃用时也“必须 MUST ”递增。也“可以 MAY ”在内部程序有大量新功能或改进被加入时递增，其中“可以 MAY ”包括修订级别的改变。每当次版本号递增时，修订号“必须 MUST ”归零。</p>
+</li>
+<li><p>主版本号 X（X.y.z | X &gt; 0）“必须 MUST ”在有任何不兼容的修改被加入公共 API 时递增。其中“可以 MAY ”包括次版本号及修订级别的改变。每当主版本号递增时，次版本号和修订号“必须 MUST ”归零。</p>
+</li>
+<li><p>先行版本号“可以 MAY ”被标注在修订版之后，先加上一个连接号再加上一连串以句点分隔的标识符号来修饰。标识符号“必须 MUST ”由 ASCII 码的英数字和连接号 [0-9A-Za-z-] 组成，且“禁止 MUST NOT ”留白。数字型的标识符号“禁止 MUST NOT ”在前方补零。先行版的优先级低于相关联的标准版本。被标上先行版本号则表示这个版本并非稳定而且可能无法达到兼容的需求。范例：1.0.0-alpha、1.0.0-alpha.1、1.0.0-0.3.7、1.0.0-x.7.z.92。</p>
+</li>
+<li><p>版本编译信息“可以 MAY ”被标注在修订版或先行版本号之后，先加上一个加号再加上一连串以句点分隔的标识符号来修饰。标识符号“必须 MUST ”由 ASCII 的英数字和连接号 [0-9A-Za-z-] 组成，且“禁止 MUST NOT ”留白。当判断版本的优先层级时，版本编译信息“可 SHOULD ”被忽略。因此当两个版本只有在版本编译信息有差别时，属于相同的优先层级。范例：1.0.0-alpha+001、1.0.0+20130313144700、1.0.0-beta+exp.sha.5114f85。</p>
+</li>
+<li><p>版本的优先层级指的是不同版本在排序时如何比较。判断优先层级时，“必须 MUST ”把版本依序拆分为主版本号、次版本号、修订号及先行版本号后进行比较（版本编译信息不在这份比较的列表中）。由左到右依序比较每个标识符号，第一个差异值用来决定优先层级：主版本号、次版本号及修订号以数值比较，例如：1.0.0 &lt; 2.0.0 &lt; 2.1.0 &lt; 2.1.1。当主版本号、次版本号及修订号都相同时，改以优先层级比较低的先行版本号决定。例如：1.0.0-alpha &lt; 1.0.0。有相同主版本号、次版本号及修订号的两个先行版本号，其优先层级“必须 MUST ”透过由左到右的每个被句点分隔的标识符号来比较，直到找到一个差异值后决定：只有数字的标识符号以数值高低比较，有字母或连接号时则逐字以 ASCII 的排序来比较。数字的标识符号比非数字的标识符号优先层级低。若开头的标识符号都相同时，栏位比较多的先行版本号优先层级比较高。范例：1.0.0-alpha &lt; 1.0.0-alpha.1 &lt; 1.0.0-alpha.beta &lt; 1.0.0-beta &lt; 1.0.0-beta.2 &lt; 1.0.0-beta.11 &lt; 1.0.0- rc.1 &lt; 1.0.0。</p>
+</li>
+</ul>
+</blockquote>
+<h2 id="语义化版本号规则"><a href="#语义化版本号规则" class="headerlink" title="语义化版本号规则"></a>语义化版本号规则</h2><h5 id="Hyphen-Ranges-X-Y-Z-A-B-C-连字符范围"><a href="#Hyphen-Ranges-X-Y-Z-A-B-C-连字符范围" class="headerlink" title="Hyphen Ranges X.Y.Z - A.B.C 连字符范围"></a>Hyphen Ranges X.Y.Z - A.B.C 连字符范围</h5><ul>
+<li>1.2.3 - 2.3.4 等价于 &gt;=1.2.3 &lt;=2.3.4</li>
+<li>1.2.3 - 2  等价于 &gt;=1.2.3 &lt;3.0.0</li>
+</ul>
+<h5 id="X-Ranges-X-x-or"><a href="#X-Ranges-X-x-or" class="headerlink" title="X-Ranges X, x, or *"></a>X-Ranges X, x, or *</h5><ul>
+<li>* 等价于 &gt;=0.0.0 </li>
+<li>1.x 等价于 &gt;=1.0.0 &lt;2.0.0 </li>
+<li>1.2.x 等价于 &gt;=1.2.0 &lt;1.3.0 </li>
+</ul>
+<h5 id="Tilde-Ranges-1-2-3-波浪线范围"><a href="#Tilde-Ranges-1-2-3-波浪线范围" class="headerlink" title="Tilde Ranges ~1.2.3 波浪线范围"></a>Tilde Ranges ~1.2.3 波浪线范围</h5><blockquote>
+<p>Allows patch-level changes if a minor version is specified on the comparator. Allows minor-level changes if not.</p>
+</blockquote>
+<p>在次版本号存在的情况下，只会指定修订号的范围，否则指定此版本号的范围。</p>
+<ul>
+<li><p>~1.2.3 等价于 &gt;=1.2.3 &lt;1.(2+1).0 等价于 &gt;=1.2.3 &lt;1.3.0</p>
+</li>
+<li><p>~1.2 等价于 &gt;=1.2.0 &lt;1.(2+1).0 等价于 &gt;=1.2.0 &lt;1.3.0 (Same as 1.2.x)</p>
+</li>
+<li><p>~1 等价于 &gt;=1.0.0 &lt;(1+1).0.0 等价于 &gt;=1.0.0 &lt;2.0.0 (Same as 1.x)</p>
+</li>
+<li><p>~0.2.3 等价于 &gt;=0.2.3 &lt;0.(2+1).0 等价于 &gt;=0.2.3 &lt;0.3.0</p>
+</li>
+<li><p>~0.2 等价于 &gt;=0.2.0 &lt;0.(2+1).0 等价于 &gt;=0.2.0 &lt;0.3.0 (Same as 0.2.x)</p>
+</li>
+<li><p>~0 等价于 &gt;=0.0.0 &lt;(0+1).0.0 等价于 &gt;=0.0.0 &lt;1.0.0 (Same as 0.x)</p>
+</li>
+</ul>
+<h5 id="Caret-Ranges-1-2-3-脱字符范围"><a href="#Caret-Ranges-1-2-3-脱字符范围" class="headerlink" title="Caret Ranges ^1.2.3 脱字符范围"></a>Caret Ranges ^1.2.3 脱字符范围</h5><blockquote>
+<p>Allows changes that do not modify the left-most non-zero digit in the [major, minor, patch] tuple. </p>
+</blockquote>
+<p>脱字符范围之后指定从左面起第一个非零位置的范围。</p>
+<ul>
+<li><p>^1.2.3 等价于 &gt;=1.2.3 &lt;2.0.0</p>
+</li>
+<li><p>^0.2.3 等价于 &gt;=0.2.3 &lt;0.3.0</p>
+</li>
+<li><p>^0.0.3 等价于 &gt;=0.0.3 &lt;0.0.4，即等价于0.0.3</p>
+</li>
+</ul>
+<p>当然如果最后一位省略了或为通配符x,X,*,则指定前一位字符的范围，如</p>
+<ul>
+<li><p>^1.2.x 等价于 &gt;=1.2.0 &lt;2.0.0</p>
+</li>
+<li><p>^0.0.x 等价于 &gt;=0.0.0 &lt;0.1.0</p>
+</li>
+<li><p>^0.0 等价于 &gt;=0.0.0 &lt;0.1.0</p>
+</li>
+</ul>
+<h2 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h2><p><a href="http://semver.org/" target="_blank" rel="noopener">http://semver.org/</a><br><a href="https://docs.npmjs.com/misc/semver" target="_blank" rel="noopener">https://docs.npmjs.com/misc/semver</a></p>
+</div></article><div id="disqus_thread"></div><script>var disqus_config = function () {
+  this.page.url = "http://yoursite.com/2016/06/06/semantic-versioning/";
+  this.page.identifier = "2016/06/06/semantic-versioning/";
+};
+
+(function () {
+  var d = document, s = d.createElement('script');
+  s.src = 'https://ciqu.disqus.com/embed.js';
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();</script></div></body><script>var _hmt = _hmt || []
+;(function () {
+  var hm = document.createElement("script")
+  hm.src = "https://hm.baidu.com/hm.js?ad593ccdd2ffe5cf791b35fee21d343d"
+  var s = document.getElementsByTagName("script")[0]
+  s.parentNode.insertBefore(hm, s)
+})()</script></html>
